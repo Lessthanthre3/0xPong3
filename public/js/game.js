@@ -56,9 +56,9 @@ class PongGame {
         this.countdown = document.getElementById('countdown');
         this.countdownNumber = document.querySelector('.countdown-number');
 
-        // Socket.io setup
-        this.socket = io();
-        this.setupSocketListeners();
+        // Stats update interval
+        this.statsUpdateInterval = null;
+        this.startStatsPolling();
 
         // Bind event listeners
         this.bindEvents();
@@ -116,54 +116,90 @@ class PongGame {
         });
     }
 
-    setupSocketListeners() {
-        // Stats updates
-        this.socket.on('statsUpdate', (data) => {
-            this.updateAIStats(data.aiStats);
-            this.updateLeaderboard(data.leaderboard);
-        });
+    startStatsPolling() {
+        // Update stats every 5 seconds
+        this.statsUpdateInterval = setInterval(() => {
+            this.updateAllStats();
+        }, 5000);
         
-        this.socket.on('playerStatsUpdate', (stats) => {
-            this.updatePlayerStats(stats);
-        });
-        
-        // Register player when wallet is connected
-        window.addEventListener('walletConnected', (e) => {
-            this.socket.emit('register', { walletAddress: e.detail.address });
-        });
+        // Initial update
+        this.updateAllStats();
+    }
+    
+    async updateAllStats() {
+        try {
+            // Fetch AI stats
+            const aiStatsResponse = await fetch('/api/stats/ai');
+            const aiStats = await aiStatsResponse.json();
+            this.updateAIStats(aiStats);
+            
+            // Fetch leaderboard
+            const leaderboardResponse = await fetch('/api/leaderboard');
+            const leaderboard = await leaderboardResponse.json();
+            this.updateLeaderboard(leaderboard);
+            
+            // Fetch player stats if wallet is connected
+            if (window.walletAddress) {
+                const playerStatsResponse = await fetch(`/api/stats/${window.walletAddress}`);
+                const playerStats = await playerStatsResponse.json();
+                this.updatePlayerStats(playerStats);
+            }
+        } catch (error) {
+            console.error('Error updating stats:', error);
+        }
     }
     
     updateAIStats(stats) {
-        document.getElementById('total-games').textContent = stats.totalGames || 0;
-        document.getElementById('ai-wins').textContent = stats.aiWins || 0;
-        document.getElementById('player-wins').textContent = stats.playerWins || 0;
-        document.getElementById('ai-streak').textContent = stats.currentStreak || 0;
-        document.getElementById('unique-players').textContent = stats.uniquePlayers || 0;
+        if (!stats) return;
+        
+        const elements = {
+            'total-games': stats.totalGames || 0,
+            'ai-wins': stats.aiWins || 0,
+            'player-wins': stats.playerWins || 0,
+            'ai-streak': stats.currentStreak || 0,
+            'unique-players': stats.uniquePlayers || 0
+        };
+        
+        Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+        });
     }
     
     updatePlayerStats(stats) {
-        document.getElementById('player-rating').textContent = stats.rating || 0;
-        document.getElementById('games-played').textContent = stats.gamesPlayed || 0;
-        document.getElementById('win-loss').textContent = `${stats.wins || 0}/${stats.losses || 0}`;
+        if (!stats) return;
+        
+        const elements = {
+            'player-rating': stats.rating || 0,
+            'games-played': stats.gamesPlayed || 0,
+            'win-loss': `${stats.wins || 0}/${stats.losses || 0}`
+        };
+        
+        Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+        });
     }
     
     updateLeaderboard(leaderboard) {
-        const leaderboardElement = document.getElementById('leaderboard-table');
+        const leaderboardElement = document.querySelector('.leaderboard-content');
         if (!leaderboardElement) return;
         
         if (!leaderboard || leaderboard.length === 0) {
-            leaderboardElement.innerHTML = '<tr><td colspan="4">No players yet. Be the first to play!</td></tr>';
+            leaderboardElement.innerHTML = '<div class="no-players">No players yet. Be the first to play!</div>';
             return;
         }
         
-        leaderboardElement.innerHTML = leaderboard.map((player, index) => `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${player.walletAddress.slice(0, 6)}...${player.walletAddress.slice(-4)}</td>
-                <td>${player.rating}</td>
-                <td>${((player.wins / (player.wins + player.losses)) * 100 || 0).toFixed(1)}%</td>
-            </tr>
-        `).join('');
+        leaderboardElement.innerHTML = leaderboard
+            .map((player, index) => `
+                <div class="leaderboard-row">
+                    <span class="rank">${index + 1}</span>
+                    <span class="player">${player.walletAddress.slice(0, 6)}...${player.walletAddress.slice(-4)}</span>
+                    <span class="rating">${player.rating}</span>
+                    <span class="win-rate">${((player.wins / (player.wins + player.losses)) * 100 || 0).toFixed(1)}%</span>
+                </div>
+            `)
+            .join('');
     }
 
     async initializeGame() {
@@ -436,6 +472,13 @@ class PongGame {
 
         this.draw();
         requestAnimationFrame(this.gameLoop.bind(this));
+    }
+
+    cleanup() {
+        // Clear polling interval when game is destroyed
+        if (this.statsUpdateInterval) {
+            clearInterval(this.statsUpdateInterval);
+        }
     }
 }
 
