@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0xPong3</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <button id="admin-button" class="admin-button">
+            <i class="fas fa-lock"></i>
+        </button>
+
+        <div id="admin-panel" class="hidden">
+            <div class="admin-header">
+                <h2>Admin Panel</h2>
+                <button id="admin-close" class="close-button">&times;</button>
+            </div>
+            <div class="admin-content">
+                <button id="reset-all" class="admin-reset-button">Reset All Data</button>
+            </div>
+        </div>
+
+        <div id="wallet-info">
+            <button id="connect-wallet">Connect Phantom Wallet</button>
+            <span id="wallet-address"></span>
+        </div>
+
+        <div class="logo-container">
+            <h1 class="game-logo">0xPONG<span class="logo-3">3</span></h1>
+        </div>
+        
+        <div id="game-section">
+            <div id="game-wrapper">
+                <canvas id="gameCanvas"></canvas>
+                <div id="score-container">
+                    <div id="player-score">0</div>
+                    <div id="ai-score">0</div>
+                </div>
+                <div id="game-overlay" class="active">
+                    <div id="wallet-required" class="hidden">Connect wallet to play</div>
+                    <button id="start-button" disabled>Start Game</button>
+                </div>
+                <div id="countdown" class="hidden">
+                    <span class="countdown-number"></span>
+                </div>
+            </div>
+
+            <div id="stats-panel">
+                <h2>AI Stats</h2>
+                <div class="stat-item">
+                    <label>Total Games:</label>
+                    <span id="total-games">0</span>
+                </div>
+                <div class="stat-item">
+                    <label>AI Wins:</label>
+                    <span id="ai-wins">0</span>
+                </div>
+                <div class="stat-item">
+                    <label>Player Wins:</label>
+                    <span id="player-wins">0</span>
+                </div>
+                <div class="stat-item">
+                    <label>AI Win Streak:</label>
+                    <span id="current-streak">0</span>
+                </div>
+                <div class="stat-item">
+                    <label>Unique Players:</label>
+                    <span id="unique-players">0</span>
+                </div>
+                <h3>Your Stats</h3>
+                <div class="stat-item">
+                    <label>Rating:</label>
+                    <span id="player-rating">0</span>
+                </div>
+                <div class="stat-item">
+                    <label>Games Played:</label>
+                    <span id="player-games">0</span>
+                </div>
+                <div class="stat-item">
+                    <label>Win/Loss:</label>
+                    <span id="player-record">0/0</span>
+                </div>
+
+                <div class="coming-soon-box">
+                    <h4>Coming Soon</h4>
+                    <ul>
+                        <li>Play2Earn</li>
+                        <li>Player vs Player</li>
+                        <li>Rewards</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="leaderboard">
+                <h2>Global Leaderboard</h2>
+                <div id="leaderboard-entries"></div>
+            </div>
+        </div>
+
+        <div id="tutorial" class="hidden">
+            <h3>How to Play</h3>
+            <p>Use your mouse or up/down arrow keys to move the paddle</p>
+            <p>Score points by getting the ball past the AI paddle</p>
+            <button id="close-tutorial">Got it!</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/wallet.js"></script>
+    <script src="js/leaderboard.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
