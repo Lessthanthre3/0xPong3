@@ -56,6 +56,10 @@ class PongGame {
         this.countdown = document.getElementById('countdown');
         this.countdownNumber = document.querySelector('.countdown-number');
 
+        // Socket.io setup
+        this.socket = io();
+        this.setupSocketListeners();
+
         // Bind event listeners
         this.bindEvents();
         
@@ -110,6 +114,56 @@ class PongGame {
         this.startButton.addEventListener('click', () => {
             this.initializeGame();
         });
+    }
+
+    setupSocketListeners() {
+        // Stats updates
+        this.socket.on('statsUpdate', (data) => {
+            this.updateAIStats(data.aiStats);
+            this.updateLeaderboard(data.leaderboard);
+        });
+        
+        this.socket.on('playerStatsUpdate', (stats) => {
+            this.updatePlayerStats(stats);
+        });
+        
+        // Register player when wallet is connected
+        window.addEventListener('walletConnected', (e) => {
+            this.socket.emit('register', { walletAddress: e.detail.address });
+        });
+    }
+    
+    updateAIStats(stats) {
+        document.getElementById('total-games').textContent = stats.totalGames || 0;
+        document.getElementById('ai-wins').textContent = stats.aiWins || 0;
+        document.getElementById('player-wins').textContent = stats.playerWins || 0;
+        document.getElementById('ai-streak').textContent = stats.currentStreak || 0;
+        document.getElementById('unique-players').textContent = stats.uniquePlayers || 0;
+    }
+    
+    updatePlayerStats(stats) {
+        document.getElementById('player-rating').textContent = stats.rating || 0;
+        document.getElementById('games-played').textContent = stats.gamesPlayed || 0;
+        document.getElementById('win-loss').textContent = `${stats.wins || 0}/${stats.losses || 0}`;
+    }
+    
+    updateLeaderboard(leaderboard) {
+        const leaderboardElement = document.getElementById('leaderboard-table');
+        if (!leaderboardElement) return;
+        
+        if (!leaderboard || leaderboard.length === 0) {
+            leaderboardElement.innerHTML = '<tr><td colspan="4">No players yet. Be the first to play!</td></tr>';
+            return;
+        }
+        
+        leaderboardElement.innerHTML = leaderboard.map((player, index) => `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${player.walletAddress.slice(0, 6)}...${player.walletAddress.slice(-4)}</td>
+                <td>${player.rating}</td>
+                <td>${((player.wins / (player.wins + player.losses)) * 100 || 0).toFixed(1)}%</td>
+            </tr>
+        `).join('');
     }
 
     async initializeGame() {

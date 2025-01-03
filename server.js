@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const path = require('path');
 const dbService = require('./services/DatabaseService');
 require('dotenv').config();
+const http = require('http');
+const socketIO = require('socket.io');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -26,6 +28,12 @@ app.post('/api/game/record', async (req, res) => {
     try {
         const { playerWallet, playerScore, aiScore, duration } = req.body;
         const result = await dbService.recordGame(playerWallet, playerScore, aiScore, duration);
+        
+        // Fetch updated stats and emit to all clients
+        const aiStats = await dbService.getAIStats();
+        const leaderboard = await dbService.getLeaderboard();
+        io.emit('statsUpdate', { aiStats, leaderboard });
+        
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -103,7 +111,43 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// WebSocket connection handling
+const server = http.createServer(app);
+const io = socketIO(server);
+const activePlayers = new Map();
+
+io.on('connection', async (socket) => {
+    console.log('New client connected');
+    
+    try {
+        // Send initial stats to newly connected client
+        const aiStats = await dbService.getAIStats();
+        const leaderboard = await dbService.getLeaderboard();
+        socket.emit('statsUpdate', { aiStats, leaderboard });
+    } catch (error) {
+        console.error('Error fetching initial stats:', error);
+    }
+    
+    // Player registration
+    socket.on('register', async (data) => {
+        const { walletAddress } = data;
+        activePlayers.set(walletAddress, socket);
+        socket.walletAddress = walletAddress;
+        
+        // Send player's personal stats
+        try {
+            const playerStats = await dbService.getPlayerStats(walletAddress);
+            socket.emit('playerStatsUpdate', playerStats);
+        } catch (error) {
+            console.error('Error fetching player stats:', error);
+        }
+        
+        // Broadcast updated active players list
+        io.emit('activePlayers', Array.from(activePlayers.keys()));
+    });
+});
+
 // Start server
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
