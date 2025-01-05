@@ -1,0 +1,259 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #000;
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px;
+}
+
+canvas {
+    background-color: #000;
+    border: 2px solid #fff;
+    display: block;
+    margin: 0 auto;
+}
+
+#wallet-info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 100;
+}
+
+#connect-wallet {
+    background-color: #9945FF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+}
+
+#connect-wallet:hover {
+    background-color: #7B35DB;
+}
+
+#wallet-address {
+    display: none;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.admin-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 20px;
+    z-index: 100;
+}
+
+#admin-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.admin-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.admin-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-reset-button {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+}
+
+.admin-reset-button:hover {
+    background-color: #cc0000;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#tutorial {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 1000;
+}
+
+#tutorial h3 {
+    margin-top: 0;
+    color: #9945FF;
+}
+
+#tutorial p {
+    margin: 10px 0;
+    font-size: 12px;
+}
+
+#close-tutorial {
+    background-color: #9945FF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+    margin-top: 20px;
+}
+
+#close-tutorial:hover {
+    background-color: #7B35DB;
+}
+
+/* Stats Section */
+.stats-container {
+    position: absolute;
+    left: 10px;
+    top: 60px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 12px;
+    max-width: 250px;
+}
+
+.stats-section {
+    margin-bottom: 20px;
+}
+
+.stats-section h3 {
+    color: #9945FF;
+    margin: 0 0 10px 0;
+    font-size: 14px;
+}
+
+.stat-item {
+    margin: 5px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Leaderboard Section */
+.leaderboard-container {
+    position: absolute;
+    right: 10px;
+    top: 60px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 12px;
+    max-width: 300px;
+}
+
+.leaderboard-header {
+    color: #9945FF;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 10px;
+    padding: 5px 0;
+    align-items: center;
+}
+
+.rank {
+    color: #9945FF;
+}
+
+.wallet {
+    color: #fff;
+    font-size: 10px;
+}
+
+.rating {
+    color: #ffd700;
+}
+
+.win-rate {
+    color: #00ff00;
+}
+
+.top-three {
+    background-color: rgba(153, 69, 255, 0.1);
+    border-radius: 3px;
+}
+
+.coming-soon {
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+#start-game {
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+    background-color: #9945FF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+}
